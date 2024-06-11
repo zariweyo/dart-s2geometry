@@ -21,13 +21,10 @@ import 'dart:math';
 
 import 's2coords.dart';
 import 's2coords_impl.dart';
-import 's2point.dart';
 export 's2point.dart';
 import 's2latlng.dart';
 import 'util/bits/bits.dart';
 
-const int _kFaceBits = 3;
-const int _kNumFaces = 6;
 const int _kMaxLevel = kMaxCellLevel; // Valid levels: 0..kMaxLevel
 const int _kPosBits = 2 * _kMaxLevel + 1;
 const int _kMaxSize = 1 << _kMaxLevel;
@@ -160,7 +157,7 @@ class S2CellId {
   // func lsbForLevel(level int) uint64 { return 1 << uint64(2*(maxLevel-level)) }
 
   // Parent returns the cell at the given level, which must be no greater than the current level.
-  S2CellId parent([int level]) {
+  S2CellId parent([int? level]) {
     int lsb = _lsbForLevel(level == null ? this.level - 1 : level);
     return new S2CellId((_id & -lsb) | lsb);
   }
@@ -265,11 +262,15 @@ class S2CellId {
 
   @override
   bool operator ==(Object other) {
-    S2CellId cellId = other;
-    return _id == cellId._id;
+    if (other is S2CellId) {
+      S2CellId cellId = other;
+      return _id == cellId._id;
+    }
+
+    return false;
   }
 
-  bool operator <(Object other) {
+  bool operator <(S2CellId other) {
     // Unsigned comparison
     S2CellId cellId = other;
     if (_id > 0 == cellId._id > 0) {
@@ -278,7 +279,7 @@ class S2CellId {
     return _id > 0;
   }
 
-  bool operator >(Object other) {
+  bool operator >(S2CellId other) {
     // Unsigned comparison
     S2CellId cellId = other;
     if (_id > 0 == cellId._id > 0) {
