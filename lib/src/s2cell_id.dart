@@ -19,6 +19,8 @@
 import 'dart:typed_data';
 import 'dart:math';
 
+import 'package:s2geometry/src/faceijorientation.dart';
+
 import 's2coords.dart';
 import 's2coords_impl.dart';
 export 's2point.dart';
@@ -253,6 +255,8 @@ class S2CellId {
     return _id;
   }
 
+  int get face => id & kFaceMask;
+
   int _id = 0;
 
   @override
@@ -286,5 +290,69 @@ class S2CellId {
       return _id > cellId._id;
     }
     return _id < 0;
+  }
+
+  S2CellId.fromToken(String token) {
+    if (token.length > 16) {
+      _id = 0;
+      return;
+    }
+
+    int id = 0;
+    int pos = 60;
+    for (int i = 0; i < token.length; i++, pos -= 4) {
+      int d;
+      int charCode = token.codeUnitAt(i);
+      if (charCode >= '0'.codeUnitAt(0) && charCode <= '9'.codeUnitAt(0)) {
+        d = charCode - '0'.codeUnitAt(0);
+      } else if (charCode >= 'a'.codeUnitAt(0) &&
+          charCode <= 'f'.codeUnitAt(0)) {
+        d = charCode - 'a'.codeUnitAt(0) + 10;
+      } else if (charCode >= 'A'.codeUnitAt(0) &&
+          charCode <= 'F'.codeUnitAt(0)) {
+        d = charCode - 'A'.codeUnitAt(0) + 10;
+      } else {
+        _id = 0;
+        return;
+      }
+      id |= d << pos;
+    }
+    _id = id;
+  }
+
+  static int get kFaceMask => 0x7;
+  static int get kMaxLevel => 0x1E;
+  static int get kLookupBits => 0x04;
+
+  FaceIJOrientation toFaceIJOrientation() {
+    int i = 0, j = 0;
+    int face = this.face;
+    int bits = face & kSwapMask;
+
+    int getBits(int k) {
+      final int nbits = (k == 7) ? (kMaxLevel - 7 * kLookupBits) : kLookupBits;
+      bits += (id >> (k * 2 * kLookupBits + 1) & ((1 << (2 * nbits)) - 1)) << 2;
+      bits = _lookupIJ[bits];
+      i += (bits >> (kLookupBits + 2)) << (k * kLookupBits);
+      j += ((bits >> 2) & ((1 << kLookupBits) - 1)) << (k * kLookupBits);
+      bits &= (kSwapMask | kInvertMask);
+      return bits;
+    }
+
+    for (int k = 7; k >= 0; k--) {
+      getBits(k);
+    }
+
+    int? orientation;
+    if (lsb() & 0x1111111111111110 != 0) {
+      bits ^= kSwapMask;
+    }
+    orientation = bits;
+
+    return FaceIJOrientation(face, i, j, orientation);
+  }
+
+  static int getSizeIJ(int level) {
+    return 1 << (kMaxLevel - level);
   }
 }

@@ -76,24 +76,47 @@ void main() {
           0xb112966aaaaaaaab);
     });
     test('S2CellId.parent', () {
-      expect(new S2CellId(0x47a1cbd595522b39).parent(), new S2CellId(0x47a1cbd595522b39).immediateParent());
-      expect(new S2CellId(0x47a1cbd595522b39).parent(29), new S2CellId(0x47a1cbd595522b39).immediateParent());
-      expect(new S2CellId(0x47a1cbd595522b39).parent(28), new S2CellId(0x47a1cbd595522b39).immediateParent().immediateParent());
-      expect(new S2CellId(0x47a1cbd595522b39).parent(28).id, 0x47a1cbd595522b30);
+      expect(new S2CellId(0x47a1cbd595522b39).parent(),
+          new S2CellId(0x47a1cbd595522b39).immediateParent());
+      expect(new S2CellId(0x47a1cbd595522b39).parent(29),
+          new S2CellId(0x47a1cbd595522b39).immediateParent());
+      expect(new S2CellId(0x47a1cbd595522b39).parent(28),
+          new S2CellId(0x47a1cbd595522b39).immediateParent().immediateParent());
+      expect(
+          new S2CellId(0x47a1cbd595522b39).parent(28).id, 0x47a1cbd595522b30);
       expect(new S2CellId(0x47a1cbd595522b39).parent(13).level, 13);
     });
     test('S2CellId.operator', () {
-      expect(new S2CellId(0xf7a1cbd595522b39) > new S2CellId(0x07a1cbd595522b39), isTrue);
-      expect(new S2CellId(0xf7a1cbd595522b39) > new S2CellId(0xe7a1cbd595522b39), isTrue);
-      expect(new S2CellId(0x17a1cbd595522b39) > new S2CellId(0x07a1cbd595522b39), isTrue);
-      expect(new S2CellId(0xf7a1cbd595522b39) < new S2CellId(0x07a1cbd595522b39), isFalse);
-      expect(new S2CellId(0xf7a1cbd595522b39) < new S2CellId(0xe7a1cbd595522b39), isFalse);
-      expect(new S2CellId(0x17a1cbd595522b39) < new S2CellId(0x07a1cbd595522b39), isFalse);
+      expect(
+          new S2CellId(0xf7a1cbd595522b39) > new S2CellId(0x07a1cbd595522b39),
+          isTrue);
+      expect(
+          new S2CellId(0xf7a1cbd595522b39) > new S2CellId(0xe7a1cbd595522b39),
+          isTrue);
+      expect(
+          new S2CellId(0x17a1cbd595522b39) > new S2CellId(0x07a1cbd595522b39),
+          isTrue);
+      expect(
+          new S2CellId(0xf7a1cbd595522b39) < new S2CellId(0x07a1cbd595522b39),
+          isFalse);
+      expect(
+          new S2CellId(0xf7a1cbd595522b39) < new S2CellId(0xe7a1cbd595522b39),
+          isFalse);
+      expect(
+          new S2CellId(0x17a1cbd595522b39) < new S2CellId(0x07a1cbd595522b39),
+          isFalse);
     });
     test('S2CellId.toToken', () {
       expect(new S2CellId(0x47a1cbd595522b39).toToken(), "47a1cbd595522b39");
-      expect(new S2CellId(0x47a1cbd595522b39).parent(29).toToken(), "47a1cbd595522b3c");
-      expect(new S2CellId(0x47a1cbd595522b39).parent(28).toToken(), "47a1cbd595522b3");
+      expect(new S2CellId(0x47a1cbd595522b39).parent(29).toToken(),
+          "47a1cbd595522b3c");
+      expect(new S2CellId(0x47a1cbd595522b39).parent(28).toToken(),
+          "47a1cbd595522b3");
+    });
+
+    test('S2CellId.fromToken', () {
+      expect(new S2CellId.fromToken("47a1cbd595522b39").id, 0x47a1cbd595522b39);
+      expect(new S2CellId.fromToken("47a1cbd595522b3c").level, 29);
     });
   });
 }
